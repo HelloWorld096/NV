@@ -1,0 +1,40 @@
+{
+  "anime_list": [
+    {
+      "anime_name": "Violet Evergarden",
+      "details": {
+        "language": ["English", "Japanese"],
+        "tag": "Combo",
+        "season": "1 Season [24 Episodes] + 1 OVA + 2 Movies",
+        "quality": ["480p", "720p", "1080p"],
+        "genres": ["Drama", "Fantasy", "Slice of Life"],
+        "description": "Violet, a former child soldier, seeks to understand the meaning of love in a world recovering from the aftermath of war. As she works as a letter-writer, she discovers the impact her words have on others and herself.",
+        "download_link": ""
+      }
+    },
+    {
+      "anime_name": "Parasyte The Maxim",
+      "details": {
+        "language": ["English", "Japanese"],
+        "tag": "Series",
+        "season": "1 Season [24 Episodes]",
+        "quality": ["480p", "720p", "1080p"],
+        "genres": ["Action", "Horror", "Psychological", "Sci-Fi"],
+        "description": "A high school student, Shinichi Izumi, finds his right hand taken over by a mysterious parasite. Together, they must survive attacks from other parasites while grappling with questions of humanity and morality.",
+        "download_link": ""
+      }
+    },
+    {
+      "anime_name": "Hell's Paradise",
+      "details": {
+        "language": ["English", "Japanese"],
+        "tag": "Series",
+        "season": "1 Season [13 Episodes]",
+        "quality": ["480p", "720p", "1080p"],
+        "genres": ["Action", "Adventure", "Mystery", "Supernatural"],
+        "description": "In a world where criminals are offered a chance at redemption, Hell's Paradise: Jigokuraku follows a group of death row inmates who are sent to a mysterious island rumored to hold the elixir of immortality. The inmates must navigate the treacherous terrain, battle deadly creatures, and confront their own demons in order to survive and claim the coveted prize.",
+        "download_link": ""
+      }
+    }
+  ]
+}
