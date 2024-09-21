@@ -35,7 +35,7 @@
     },
     {
         "name": "Parasite The Maxim",
-        "thumbnail": "cover/IMG_20240918_233542_762.jpg",
+        "thumbnail": "https://raw.githubusercontent.com/HelloWorld096/NV/refs/heads/main/cover/IMG_20240918_233542_762.jpg",
         "langs": [
             "English",
             "Japanese"
