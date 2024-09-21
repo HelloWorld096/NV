@@ -1,7 +1,6 @@
 [
     {
         "name": "Violet Evergarden",
-        "thumbnail": "djdj.jpg",
         "langs": [
             "English",
             "Japanese"
@@ -18,7 +17,6 @@
     },
     {
         "name": "Flavours Of Youth",
-        "thumbnail": "",
         "langs": [
             "English",
             "Japanese"
@@ -34,8 +32,7 @@
         "download": "https://drive.google.com/drive/folders/1MkQ4dG_7Mdoy0ggQ2WFPOm7uRj1EH2YC"
     },
     {
-        "name": "Parasite The Maxim",
-        "thumbnail": "https://raw.githubusercontent.com/HelloWorld096/NV/refs/heads/main/cover/IMG_20240918_233542_762.jpg",
+        "name": "Parasyte The Maxim",
         "langs": [
             "English",
             "Japanese"
@@ -71,7 +68,6 @@
     },
     {
         "name": "Hell's Paradise",
-        "thumbnail": "",
         "langs": [
             "English",
             "Japanese"
