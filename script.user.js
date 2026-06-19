@@ -6,7 +6,7 @@
 // @author       YourName
 // @match        https://www.reddit.com/login/*
 // @updateURL    https://raw.githubusercontent.com/HelloWorld096/NV/refs/heads/main/script.user.js
-// @downloadURL  https://raw.githubusercontent.com/HelloWorld096/NV/refs/heads/main/script.meta.js
+// @downloadURL  https://raw.githubusercontent.com/HelloWorld096/NV/refs/heads/main/script.user.js
 // @grant        GM_xmlhttpRequest
 // @connect      api.mail.tm
 // @run-at       document-start
