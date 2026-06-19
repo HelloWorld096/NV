@@ -1,12 +1,12 @@
 // ==UserScript==
-// @name         Reddit Sign-Up Automator (Smart Throttle)
+// @name         Sign-Up Automator
 // @namespace    http://tampermonkey.net/
 // @version      2.2
 // @description  Balances persistence with patience to prevent UI layout glitches on final submit
 // @author       YourName
 // @match        https://www.reddit.com/login/*
-// @updateURL    https://raw.githubusercontent.com/username/repo/main/script.meta.js
-// @downloadURL  https://raw.githubusercontent.com/username/repo/main/script.user.js
+// @updateURL    https://raw.githubusercontent.com/HelloWorld096/NV/refs/heads/main/script.user.js
+// @downloadURL  https://raw.githubusercontent.com/HelloWorld096/NV/refs/heads/main/script.meta.js
 // @grant        GM_xmlhttpRequest
 // @connect      api.mail.tm
 // @run-at       document-start
