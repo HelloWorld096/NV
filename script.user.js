@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         Sign-Up Automator (Pre-fetched Email)
+// @name         Sign-Up Automator
 // @namespace    http://tampermonkey.net/
 // @version      2.5
 // @description  Pre-fetches mail.tm credentials concurrently on initialization to remove setup latency
