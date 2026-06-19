@@ -1,8 +1,8 @@
 // ==UserScript==
-// @name         Sign-Up Automator
+// @name         Sign-Up Automator (Pre-fetched Email)
 // @namespace    http://tampermonkey.net/
-// @version      2.2
-// @description  Balances persistence with patience to prevent UI layout glitches on final submit
+// @version      2.5
+// @description  Pre-fetches mail.tm credentials concurrently on initialization to remove setup latency
 // @author       YourName
 // @match        https://www.reddit.com/login/*
 // @updateURL    https://raw.githubusercontent.com/HelloWorld096/NV/refs/heads/main/script.user.js
@@ -17,10 +17,11 @@
 
     let clickedSignUp = false;
     let emailFilled = false;
+    let emailProvisioningStarted = false;
     let clickedFirstContinue = false;
     let usernameTracked = false;
     let passwordFilled = false;
-    let clickedFinalContinue = false; // New flag for the .create button
+    let clickedFinalContinue = false; 
     let finalSubmitAttempted = false;
     let otpFilled = false;
 
@@ -67,7 +68,29 @@
         });
     }
 
-    // Throttled handler that respects the asynchronous network handshake
+    // CONCURRENT BACKGROUND WORKER: Start generating the email immediately on initialization
+    const emailPreFetchPromise = (async () => {
+        console.log("[Automator] Core initialized. Pre-fetching mail infrastructure concurrently...");
+        try {
+            const domainData = await backgroundRequest('https://api.mail.tm/domains', 'GET');
+            const domain = domainData['hydra:member']?.[0]?.domain;
+            if (!domain) throw new Error("API domains down.");
+
+            const user = 'user_' + Math.random().toString(36).substring(2, 11);
+            const address = `${user}@${domain}`;
+            const password = Math.random().toString(36).substring(2, 15);
+
+            await backgroundRequest('https://api.mail.tm/accounts', 'POST', { address, password });
+            const tokenData = await backgroundRequest('https://api.mail.tm/token', 'POST', { address, password });
+            
+            console.log(`[Automator] Background Inbox successfully created and allocated: ${address}`);
+            return { address, password, token: tokenData.token };
+        } catch (err) {
+            console.error("[Automator] Background pre-fetch execution failure:", err);
+            throw err;
+        }
+    })();
+
     function executeThrottledSubmit() {
         console.log("[Automator] Transitioning to throttled verification processing flow...");
 
@@ -97,7 +120,7 @@
         processStep();
     }
 
-    const monitorInterval = setInterval(() => {
+    const monitorInterval = setInterval(async () => {
         // --- PHASE 1: Sign Up Toggle ---
         if (!clickedSignUp) {
             const registerLink = document.querySelector('auth-flow-link[step="register"]');
@@ -110,14 +133,36 @@
         }
 
         // --- PHASE 2: Email Configuration ---
-        if (clickedSignUp && !emailFilled) {
+        if (clickedSignUp && !emailFilled && !emailProvisioningStarted) {
             const emailWrapper = document.getElementById('register-email') || document.querySelector('faceplate-text-input[name="email"]');
             if (emailWrapper && emailWrapper.shadowRoot) {
                 const hiddenInput = emailWrapper.shadowRoot.querySelector('input');
                 if (hiddenInput) {
-                    emailFilled = true; 
-                    console.log("[Automator] Custom email layout found. Provisioning email...");
-                    applyTempEmail(emailWrapper, hiddenInput);
+                    emailProvisioningStarted = true; 
+                    console.log("[Automator] Form layer visible. Awaiting background pre-fetch resolution...");
+                    
+                    try {
+                        const preFetchedData = await emailPreFetchPromise;
+                        
+                        accountCredentials.address = preFetchedData.address;
+                        accountCredentials.password = preFetchedData.password;
+                        accountCredentials.token = preFetchedData.token;
+
+                        hiddenInput.value = accountCredentials.address;
+                        emailWrapper.value = accountCredentials.address;
+
+                        ['input', 'change', 'blur'].forEach(evtName => {
+                            const customEvt = new Event(evtName, { bubbles: true, cancelable: true, composed: true });
+                            hiddenInput.dispatchEvent(customEvt);
+                            emailWrapper.dispatchEvent(customEvt);
+                        });
+
+                        console.log(`[Automator] Form populated with pre-fetched inbox: ${accountCredentials.address}`);
+                        emailFilled = true;
+                    } catch (e) {
+                        // Reset flag to try generating a backup if concurrent creation errored out
+                        emailProvisioningStarted = false;
+                    }
                 }
             }
         }
@@ -182,41 +227,6 @@
             executeThrottledSubmit();       
         }
     }, 300);
-
-    // ... (rest of the helper functions: applyTempEmail, startOtpPollingFlow, fillOtpField)
-    async function applyTempEmail(componentWrapper, trueNativeInput) {
-        try {
-            const domainData = await backgroundRequest('https://api.mail.tm/domains', 'GET');
-            const domain = domainData['hydra:member']?.[0]?.domain;
-            if (!domain) throw new Error("API domains down.");
-
-            const user = 'user_' + Math.random().toString(36).substring(2, 11);
-            const address = `${user}@${domain}`;
-            const password = Math.random().toString(36).substring(2, 15);
-
-            accountCredentials.address = address;
-            accountCredentials.password = password;
-
-            await backgroundRequest('https://api.mail.tm/accounts', 'POST', { address, password });
-            const tokenData = await backgroundRequest('https://api.mail.tm/token', 'POST', { address, password });
-            accountCredentials.token = tokenData.token;
-
-            trueNativeInput.value = address;
-            componentWrapper.value = address;
-
-            ['input', 'change', 'blur'].forEach(evtName => {
-                const customEvt = new Event(evtName, { bubbles: true, cancelable: true, composed: true });
-                trueNativeInput.dispatchEvent(customEvt);
-                componentWrapper.dispatchEvent(customEvt);
-            });
-
-            console.log(`[Automator] Inbox Bound: ${address}`);
-
-        } catch (err) {
-            console.error("[Automator] Provision error:", err);
-            emailFilled = false; 
-        }
-    }
 
     function startOtpPollingFlow() {
         const otpPollInterval = setInterval(async () => {
