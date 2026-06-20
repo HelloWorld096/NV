@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Tap to Paste</title>
+<meta name=viewport content="width=device-width, initial-scale=1.0">
+</head>
+<body onclick=i.focus() style=margin:0;height:100vh;display:flex;align-items:center;justify-content:center;font-family:sans-serif>
+<div id=t style=text-align:center;color:#666>Tap anywhere to paste URL</div>
+<input id=i oninput="t.textContent=i.value; if(i.value.includes('://'))location.href=i.value" style=position:absolute;opacity:0>
+</body>
+</html>
