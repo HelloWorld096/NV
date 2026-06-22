@@ -147,7 +147,7 @@
             backdrop-filter: blur(8px);
             -webkit-backdrop-filter: blur(8px);
             display: flex;
-            align-items: flex-end; /* Anchor to bottom for clean mobile design */
+            align-items: flex-end;
             justify-content: center;
             opacity: 0;
             pointer-events: none;
@@ -189,6 +189,7 @@
             font-weight: 700;
             margin-bottom: 16px;
             letter-spacing: -0.3px;
+            color: var(--text-main);
         }
 
         .task-list {
@@ -312,7 +313,8 @@
     </div>
 
     <script>
-        const storedIP = localStorage.getItem('last_known_ip') || '0.0.0.0';
+        // Set local UI defaults while the Userscript loads data remotely
+        const storedIP = '0.0.0.0';
         document.getElementById('ip-last').textContent = storedIP;
 
         async function fetchCurrentIP() {
@@ -320,7 +322,6 @@
                 const response = await fetch('https://api.ipify.org?format=json');
                 const data = await response.json();
                 document.getElementById('ip-now').textContent = data.ip;
-                localStorage.setItem('last_known_ip', data.ip);
             } catch (err) {
                 document.getElementById('ip-now').textContent = 'Offline';
             }
@@ -340,10 +341,10 @@
         for (let i = 0; i < 5; i++) {
             const li = document.createElement('li');
             li.className = 'task-item';
-            
+                        
             const spanText = document.createElement('span');
             spanText.textContent = generateUID();
-            
+                        
             const dot = document.createElement('span');
             dot.className = 'task-status-dot';
 
@@ -353,7 +354,6 @@
         }
 
         const overlay = document.getElementById('modal-overlay');
-        
         function openModal() {
             overlay.classList.add('active');
         }
@@ -361,19 +361,6 @@
         function closeModal(e) {
             overlay.classList.remove('active');
         }
-
-        async function checkConnection() {
-            const start = performance.now();
-            try {
-                await fetch('https://cloudflare.com/cdn-cgi/trace?cache_bust=' + start, {
-                    method: 'HEAD',
-                    mode: 'no-cors',
-                    cache: 'no-store'
-                });
-            } catch (error) {}
-        }
-        setInterval(checkConnection, 500);
-        checkConnection();
     </script>
 </body>
 </html>
