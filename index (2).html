@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minimal Mobile Buttons</title>
+    <style>
+        :root {
+            --bg: #ffffff;
+            --text-main: #111111;
+            --text-sub: #888888;
+            --btn-primary-bg: #111111;
+            --btn-primary-text: #ffffff;
+            --btn-secondary-bg: #f0f0f0;
+            --btn-secondary-text: #111111;
+            --queue-bg: #111111;
+            --queue-text: #ffffff;
+            --overlay-bg: rgba(0, 0, 0, 0.2);
+            --modal-bg: #ffffff;
+            --task-bg: #f9f9f9;
+            --task-border: #eeeeee;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #111111;
+                --text-main: #ffffff;
+                --text-sub: #666666;
+                --btn-primary-bg: #ffffff;
+                --btn-primary-text: #111111;
+                --btn-secondary-bg: #222222;
+                --btn-secondary-text: #ffffff;
+                --queue-bg: #ffffff;
+                --queue-text: #111111;
+                --overlay-bg: rgba(0, 0, 0, 0.5);
+                --modal-bg: #1c1c1e;
+                --task-bg: #2c2c2e;
+                --task-border: #3a3a3c;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .top-header {
+            display: flex;
+            width: 100%;
+            padding: 20px 16px 0;
+            align-items: center;
+        }
+
+        .header-col {
+            flex: 1;
+            display: flex;
+        }
+
+        .header-col.left {
+            justify-content: flex-start;
+        }
+
+        .queue-trigger {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: var(--btn-secondary-bg);
+            border: none;
+            cursor: pointer;
+            padding: 8px 16px 8px 8px;
+            border-radius: 24px;
+            color: var(--text-main);
+            transition: opacity 0.15s ease, transform 0.1s ease;
+        }
+
+        .queue-trigger:active {
+            opacity: 0.85;
+            transform: scale(0.97);
+        }
+
+        .queue-badge {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            background-color: var(--queue-bg);
+            color: var(--queue-text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 15px;
+            font-weight: 700;
+        }
+
+        .queue-label {
+            font-size: 15px;
+            font-weight: 700;
+            letter-spacing: -0.2px;
+        }
+
+        .header-col.right {
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            gap: 2px;
+        }
+
+        #ip-last {
+            font-size: 13px;
+            font-weight: 400;
+            color: var(--text-sub);
+            letter-spacing: -0.1px;
+            line-height: 1.2;
+        }
+
+        #ip-now {
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-main);
+            letter-spacing: -0.2px;
+            line-height: 1.2;
+        }
+
+        .main-content {
+            flex: 1;
+        }
+
+        /* Sleek Modern Bottom Sheet Modal Layout */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--overlay-bg);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            display: flex;
+            align-items: flex-end; /* Anchor to bottom for clean mobile design */
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal {
+            background-color: var(--modal-bg);
+            width: 100%;
+            max-width: 500px;
+            border-radius: 24px 24px 0 0;
+            padding: 24px 20px calc(24px + env(safe-area-inset-bottom, 0px));
+            transform: translateY(100%);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 -8px 32px rgba(0, 0, 0, 0.08);
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        /* Design elements inside modal */
+        .modal-handle {
+            width: 36px;
+            height: 4px;
+            background-color: var(--task-border);
+            border-radius: 2px;
+            margin: -12px auto 20px;
+        }
+
+        .modal-header {
+            font-size: 17px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            letter-spacing: -0.3px;
+        }
+
+        .task-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .task-item {
+            font-family: SFMono-Regular, Consolas, monospace;
+            font-size: 14px;
+            font-weight: 500;
+            padding: 14px 16px;
+            color: var(--text-main);
+            background-color: var(--task-bg);
+            border: 1px solid var(--task-border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .task-status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: var(--text-sub);
+        }
+
+        .btn-close {
+            width: 100%;
+            height: 48px;
+            border: none;
+            border-radius: 12px;
+            background-color: var(--btn-primary-bg);
+            color: var(--btn-primary-text);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.15s ease;
+        }
+
+        .btn-close:active {
+            opacity: 0.9;
+        }
+
+        /* Bottom Menu */
+        .bottom-container {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px 16px calc(16px + env(safe-area-inset-bottom, 0px));
+            display: flex;
+            gap: 12px;
+            background-color: var(--bg);
+        }
+
+        .btn {
+            flex: 1;
+            height: 48px;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-decoration: none;
+            cursor: pointer;
+            transition: opacity 0.15s ease;
+        }
+
+        .btn:active {
+            opacity: 0.8;
+        }
+
+        .btn-login {
+            background-color: var(--btn-secondary-bg);
+            color: var(--btn-secondary-text);
+        }
+
+        .btn-home {
+            background-color: var(--btn-primary-bg);
+            color: var(--btn-primary-text);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="top-header">
+        <div class="header-col left">
+            <button class="queue-trigger" onclick="openModal()">
+                <span class="queue-badge">5</span>
+                <span class="queue-label">in queue</span>
+            </button>
+        </div>
+        <div class="header-col center"></div>
+        <div class="header-col right">
+            <div id="ip-last">...</div>
+            <div id="ip-now">...</div>
+        </div>
+    </div>
+
+    <div class="main-content"></div>
+
+    <div id="modal-overlay" class="modal-overlay" onclick="closeModal(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-handle"></div>
+            <div class="modal-header">Active Tasks</div>
+            <ul id="task-list" class="task-list"></ul>
+            <button class="btn-close" onclick="closeModal()">Dismiss</button>
+        </div>
+    </div>
+
+    <div class="bottom-container">
+        <a href="/login" class="btn btn-login">Log In</a>
+        <a href="/home" class="btn btn-home">Home Feed</a>
+    </div>
+
+    <script>
+        const storedIP = localStorage.getItem('last_known_ip') || '0.0.0.0';
+        document.getElementById('ip-last').textContent = storedIP;
+
+        async function fetchCurrentIP() {
+            try {
+                const response = await fetch('https://api.ipify.org?format=json');
+                const data = await response.json();
+                document.getElementById('ip-now').textContent = data.ip;
+                localStorage.setItem('last_known_ip', data.ip);
+            } catch (err) {
+                document.getElementById('ip-now').textContent = 'Offline';
+            }
+        }
+        fetchCurrentIP();
+
+        function generateUID() {
+            const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+            let result = '';
+            for (let i = 0; i < 10; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        const taskListContainer = document.getElementById('task-list');
+        for (let i = 0; i < 5; i++) {
+            const li = document.createElement('li');
+            li.className = 'task-item';
+            
+            const spanText = document.createElement('span');
+            spanText.textContent = generateUID();
+            
+            const dot = document.createElement('span');
+            dot.className = 'task-status-dot';
+
+            li.appendChild(spanText);
+            li.appendChild(dot);
+            taskListContainer.appendChild(li);
+        }
+
+        const overlay = document.getElementById('modal-overlay');
+        
+        function openModal() {
+            overlay.classList.add('active');
+        }
+
+        function closeModal(e) {
+            overlay.classList.remove('active');
+        }
+
+        async function checkConnection() {
+            const start = performance.now();
+            try {
+                await fetch('https://cloudflare.com/cdn-cgi/trace?cache_bust=' + start, {
+                    method: 'HEAD',
+                    mode: 'no-cors',
+                    cache: 'no-store'
+                });
+            } catch (error) {}
+        }
+        setInterval(checkConnection, 500);
+        checkConnection();
+    </script>
+</body>
+</html>
